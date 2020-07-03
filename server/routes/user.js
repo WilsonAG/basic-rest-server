@@ -5,12 +5,11 @@ const _ = require('underscore');
 let app = express();
 
 const User = require('../models/user');
-const { query } = require('express');
 
 app.get('/user', (req, res) => {
   let from = Number(req.query.desde) || 0;
   let limit = Number(req.query.limite) || 5;
-  let filter = {  };
+  let filter = { status: true };
   User.find(filter, 'name email role status google')
     .limit(limit)
     .skip(from)
@@ -85,8 +84,33 @@ app.put('/user/:id', (req, res) => {
   );
 });
 
-app.delete('/user', (req, res) => {
-  res.json('Delete user');
+app.delete('/user/:id', (req, res) => {
+  let id = req.params.id;
+  // User.findOneAndDelete({ _id: id }, (err, deleted) => {
+  User.findOneAndUpdate(
+    { _id: id },
+    { status: false },
+    { new: true, runValidators: true, context: 'query' },
+    (err, deleted) => {
+      if (err)
+        return res.status(500).json({
+          ok: false,
+          err,
+        });
+
+      if (!deleted) {
+        return res.status(404).json({
+          ok: false,
+          message: 'User not found',
+        });
+      }
+
+      return res.json({
+        ok: true,
+        user: deleted,
+      });
+    }
+  );
 });
 
 module.exports = app;
