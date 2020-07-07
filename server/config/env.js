@@ -8,7 +8,7 @@ process.env.PORT = process.env.PORT || 3000;
 //                 ENV
 // ========================================
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'env';
+process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
 // ========================================
 //                 DB_URI
